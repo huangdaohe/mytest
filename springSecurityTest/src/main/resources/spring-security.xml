@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--放行指定的资源-->
+
+    <security:http pattern="/login.html" security="none"/>
+    <security:http pattern="/failer.html" security="none"/>
+    <security:http pattern="/favicon.ico" security="none"/>
+
+    <!--auto-config true表示自动生成登陆页面；如果有配置form-login就以配置的登陆页面为主-->
+    <!--use-expressions 表示是否使用SpEL表达式-->
+    <security:http auto-config="true" use-expressions="false">
+
+        <!--拦截所有的资源:pattern 拦截的资源；  access表示要求访问用户必须具有的角色.必须以ROLE_开头。-->
+        <security:intercept-url pattern="/**" access="ROLE_ADMIN"/>
+
+        <!--登陆表单配置-->
+        <security:form-login
+                login-page="/login.html"
+                login-processing-url="/login"
+                username-parameter="username"
+                password-parameter="password"
+                default-target-url="/success.html"
+                authentication-failure-url="/failer.html"/>
+
+        <!--退出的配置-->
+        <security:logout
+                logout-url="/logout"
+                logout-success-url="/login.html"
+                invalidate-session="true"/>
+
+        <!--关闭跨域请求的校验-->
+        <security:csrf disabled="true"/>
+
+    </security:http>
+
+    <!--配置登陆认证的账号密码（先写死）-->
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:user-service>
+                <!--{noop} 指定密码不加密-->
+                <security:user name="rose" password="{noop}888" authorities="ROLE_ADMIN"/>
+                <security:user name="jack" password="{noop}888" authorities="ROLE_ADMIN"/>
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+</beans>
